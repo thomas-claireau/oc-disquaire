@@ -1,54 +1,65 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+"""Views of the Store's app
 
-# Create your models here.
-ARTISTS = {
-    'francis-cabrel': {'name': 'Francis Cabrel'},
-    'lej': {'name': 'Elijay'},
-    'rosana': {'name': 'Rosana'},
-    'maria-dolores-pradera': {'name': 'María Dolores Pradera'},
-}
+    Functions:
+            index
+            listing
+            detail
+            search
+    """
+from django.http import HttpResponse
 
-
-ALBUMS = [
-    {'name': 'Sarbacane', 'artists': [ARTISTS['francis-cabrel']]},
-    {'name': 'La Dalle', 'artists': [ARTISTS['lej']]},
-    {'name': 'Luna Nueva', 'artists': [
-        ARTISTS['rosana'], ARTISTS['maria-dolores-pradera']]}
-]
-
-# Create your views here.
+from store.models import Album
 
 
 def index(request):
-    message = "Salut tout le monde !"
-    return HttpResponse(message)
+    """Initial route (/) of the app
+
+        Args:
+                request (object): Django's request
+
+        Returns:
+                HttpResponse: Django's httpresponse
+        """
+    albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
+    album = ["<li>{}</li>".format(album["name"]) for album in albums]
+    return HttpResponse("<h1>Index</h1><ul>{}</ul>".format("\n".join(album)))
 
 
 def listing(request):
-    album = ["<li>{}</li>".format(album["name"]) for album in ALBUMS]
+    """Route /store of the app
+
+        Args:
+                request (object): Django's request
+
+        Returns:
+                HttpResponse: Django's httpresponse
+        """
+    albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
+    album = ["<li>{}</li>".format(album["name"]) for album in albums]
     return HttpResponse("<h1>Store</h1><ul>{}</ul>".format("\n".join(album)))
 
 
 def detail(request, album_id):
-    album = ALBUMS[int(album_id)]
+    """View detail of the app
 
-    return HttpResponse("Le nom de l'album est {}".format(album["name"]))
+        Args:
+                request (object): Django's request
+
+        Returns:
+                HttpResponse: Django's httpresponse
+        """
+    return HttpResponse('detail {}'.format(album_id))
+    # return HttpResponse("Le nom de l'album est {}".format(album["name"]))
 
 
 def search(request):
-    query = request.GET.get("query")
+    """Route /search by query of the app
 
-    if not query:
-        message = "Aucun artiste n'a été demandé"
-    else:
-        albums = [album for album in ALBUMS if query in " ".join(
-            artist["name"] for artist in album["artists"])]
+        Args:
+                request (object): Django's request
 
-        if len(albums) == 0:
-            message = "Aucun album trouvé"
-        else:
-            albums = ["<li>{}</li>".format(album["name"]) for album in albums]
-            message = albums
+        Returns:
+                HttpResponse: Django's httpresponse
+        """
 
-    return HttpResponse(message)
+    return HttpResponse("search")
