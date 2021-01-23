@@ -21,7 +21,7 @@ def index(request):
                 HttpResponse: Django's httpresponse
         """
     albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
-    album = ["<li>{}</li>".format(album["name"]) for album in albums]
+    album = ["<li>{}</li>".format(album) for album in albums]
     return HttpResponse("<h1>Index</h1><ul>{}</ul>".format("\n".join(album)))
 
 
@@ -35,7 +35,7 @@ def listing(request):
                 HttpResponse: Django's httpresponse
         """
     albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
-    album = ["<li>{}</li>".format(album["name"]) for album in albums]
+    album = ["<li>{}</li>".format(album) for album in albums]
     return HttpResponse("<h1>Store</h1><ul>{}</ul>".format("\n".join(album)))
 
 
