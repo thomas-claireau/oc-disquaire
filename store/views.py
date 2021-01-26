@@ -7,7 +7,7 @@
             search
     """
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from store.models import Album
 
 
@@ -50,7 +50,7 @@ def detail(request, album_id):
         Returns:
                 HttpResponse: Django's response
         """
-    album = Album.objects.get(pk=album_id)
+    album = get_object_or_404(Album, pk=album_id)
 
     context = {
         "album_title": album.title,
