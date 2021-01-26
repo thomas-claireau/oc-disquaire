@@ -6,8 +6,8 @@
             detail
             search
     """
-from django.http import HttpResponse
 
+from django.shortcuts import render
 from store.models import Album
 
 
@@ -18,11 +18,12 @@ def index(request):
                 request (object): Django's request
 
         Returns:
-                HttpResponse: Django's httpresponse
+                HttpResponse: Django's response
         """
     albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
-    album = ["<li>{}</li>".format(album) for album in albums]
-    return HttpResponse("<h1>Index</h1><ul>{}</ul>".format("\n".join(album)))
+    context = {"albums": albums}
+
+    return render(request, "store/index.html", context)
 
 
 def listing(request):
@@ -32,11 +33,11 @@ def listing(request):
                 request (object): Django's request
 
         Returns:
-                HttpResponse: Django's httpresponse
+                HttpResponse: Django's response
         """
     albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
-    album = ["<li>{}</li>".format(album) for album in albums]
-    return HttpResponse("<h1>Store</h1><ul>{}</ul>".format("\n".join(album)))
+    context = {"albums": albums}
+    return render(request, "store/listing.html", context)
 
 
 def detail(request, album_id):
@@ -44,12 +45,20 @@ def detail(request, album_id):
 
         Args:
                 request (object): Django's request
+                album_id (int): Id of album
 
         Returns:
-                HttpResponse: Django's httpresponse
+                HttpResponse: Django's response
         """
-    return HttpResponse('detail {}'.format(album_id))
-    # return HttpResponse("Le nom de l'album est {}".format(album["name"]))
+    album = Album.objects.get(pk=album_id)
+
+    context = {
+        "album_title": album.title,
+        "thumbnail": album.picture,
+        "artists_name": ", ".join([artist.name for artist in album.artists.all()]),
+    }
+
+    return render(request, "store/detail.html", context)
 
 
 def search(request):
@@ -59,7 +68,15 @@ def search(request):
                 request (object): Django's request
 
         Returns:
-                HttpResponse: Django's httpresponse
+                HttpResponse: Django's response
         """
 
-    return HttpResponse("search")
+    query = request.GET.get('query')
+
+    albums = Album.objects.filter(title__icontains=query)
+
+    if not albums:
+        albums = Album.objects.filter(artists__name__icontains=query)
+
+    context = {"albums": albums}
+    return render(request, "store/search.html", context)

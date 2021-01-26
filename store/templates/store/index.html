@@ -1,5 +1,7 @@
-{% extends 'store/base.html' %} {% block content %}
+{% extends 'store/base.html' %}
 
-<div></div>
+{% block content %}
 
-{% include 'store/list.html' %} {% endblock %}
+    {% include 'store/list.html' with list_title='Nos derniers disques' %}
+
+{% endblock %}
